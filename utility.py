@@ -27,21 +27,16 @@ def load_data(filepath, target_col=None, no_header=False):
     else:
         label_col = df.columns[-1]
 
-    # Chuẩn hóa nhãn về 0/1
+    # Chuẩn hóa nhãn: chấp nhận bất kỳ nhãn số nguyên không âm nào (0, 1, 2, ...)
     y_raw = df[label_col].values
     unique_labels = np.unique(y_raw)
 
-    if set(unique_labels).issubset({0, 1, 0.0, 1.0}):
-        y = y_raw.astype(int)
-    elif len(unique_labels) > 2:
-        # Ví dụ dataset này có nhãn 0, 1, 2 → ánh xạ >0 thành 1
-        print(f"[CẢNH BÁO] Cột '{label_col}' có {len(unique_labels)} giá trị khác nhau.")
-        print("  Ánh xạ: > 0 → 1 (có bệnh),  = 0 → 0 (không bệnh)")
-        y = (y_raw > 0).astype(int)
-    else:
-        raise ValueError(
-            f"Nhãn không phải 0/1. Giá trị tìm thấy: {unique_labels}"
-        )
+    # Kiểm tra nhãn có phải số nguyên không
+    if not np.all(y_raw == y_raw.astype(int)):
+        raise ValueError(f"Nhãn phải là số nguyên. Giá trị tìm thấy: {unique_labels[:5]}")
+
+    y = y_raw.astype(int)
+    print(f"Cot nhan '{label_col}': {len(unique_labels)} lop — {sorted(unique_labels.tolist())}")
 
     # Bỏ cột nhãn và cột id định danh nếu có
     drop_cols = [label_col]

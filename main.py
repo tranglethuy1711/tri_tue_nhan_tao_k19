@@ -70,7 +70,6 @@ def run_benchmark(X_train, X_test, y_train, y_test):
         best_rec = max(ok, key=lambda r: r["Recall"])
         print(f"\n[KET QUA] Accuracy cao nhat : {best_acc['Model']} ({best_acc['Accuracy']*100:.2f}%)")
         print(f"[KET QUA] Recall cao nhat   : {best_rec['Model']} ({best_rec['Recall']*100:.2f}%)")
-        print("Ghi chu: Recall quan trong hon trong y te vi bo sot ca benh nguy hiem hon bao nham.")
 
     # Lưu CSV
     pd.DataFrame(results).to_csv("benchmark_results.csv", index=False)
@@ -115,7 +114,10 @@ def interactive_prediction(trained_models, preprocess_info, feature_names):
 
         x_new = transform_features(np.array(values).reshape(1, -1), preprocess_info)
         pred  = int(model.predict(x_new)[0])
-        print(f"\n[KET QUA] {model_name}: {'Co benh (lop 1)' if pred == 1 else 'Khong benh (lop 0)'}")
+        label_map = {0: "Khong mac tieu duong (lop 0)",
+                     1: "Tien tieu duong (lop 1)",
+                     2: "Mac tieu duong (lop 2)"}
+        print(f"\n[KET QUA] {model_name}: {label_map.get(pred, f'Lop {pred}')}")
 
         if input("\nDu doan benh nhan khac? (y/n): ").strip().lower() != "y":
             break

@@ -1,6 +1,7 @@
-# Perceptron — cập nhật trọng số mỗi khi dự đoán sai, bỏ qua khi đúng
+# Perceptron — multi-class: mỗi lớp có 1 bộ trọng số riêng
 #
-# Đổi nhãn 0/1 → -1/+1. Nếu sai: w += lr * y_true * x,  b += lr * y_true
+# Với mỗi mẫu, tính điểm cho tất cả lớp rồi chọn lớp cao nhất.
+# Nếu sai: tăng điểm lớp đúng, giảm điểm lớp bị chọn nhầm.
 import numpy as np
 
 
@@ -10,34 +11,31 @@ class PerceptronModel:
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.random_state = random_state
-        self.w = None
-        self.b = 0.0
 
     def fit(self, X, y):
-        # Duyệt nhiều lần, cập nhật trọng số khi dự đoán sai
         n_samples, n_features = X.shape
-        self.w = np.zeros(n_features)
-        self.b = 0.0
+        self.classes = np.unique(y)
+        n_classes = len(self.classes)
 
-        # Đổi nhãn 0 → -1, giữ 1 → +1
-        y_signed = np.where(y == 1, 1.0, -1.0)
+        # W[c] là trọng số cho lớp c, b[c] là bias
+        self.W = np.zeros((n_classes, n_features))
+        self.b = np.zeros(n_classes)
 
         rng = np.random.default_rng(self.random_state)
 
-        for epoch in range(self.epochs):
-            # Xáo trộn thứ tự mẫu mỗi epoch
-            order = rng.permutation(n_samples)
+        for _ in range(self.epochs):
+            for i in rng.permutation(n_samples):
+                scores    = self.W @ X[i] + self.b
+                pred_idx  = int(np.argmax(scores))
+                true_idx  = int(np.where(self.classes == y[i])[0][0])
 
-            for i in order:
-                z = np.dot(self.w, X[i]) + self.b
-                y_pred = 1.0 if z >= 0 else -1.0
-
-                # Chỉ cập nhật khi dự đoán sai
-                if y_pred != y_signed[i]:
-                    self.w += self.learning_rate * y_signed[i] * X[i]
-                    self.b += self.learning_rate * y_signed[i]
+                if pred_idx != true_idx:
+                    # Tăng điểm lớp đúng, giảm điểm lớp bị chọn nhầm
+                    self.W[true_idx] += self.learning_rate * X[i]
+                    self.b[true_idx] += self.learning_rate
+                    self.W[pred_idx] -= self.learning_rate * X[i]
+                    self.b[pred_idx] -= self.learning_rate
 
     def predict(self, X):
-        # Điểm >= 0 → lớp 1, điểm < 0 → lớp 0
-        z = X @ self.w + self.b
-        return np.where(z >= 0, 1, 0).astype(int)
+        scores = X @ self.W.T + self.b
+        return self.classes[np.argmax(scores, axis=1)].astype(int)

@@ -1,23 +1,23 @@
-# metrics.py — 2 độ đo: Accuracy và Recall
-from utility import confusion_matrix_counts
+# metrics.py — 2 độ đo: Accuracy và Recall (macro, hỗ trợ nhiều lớp)
+import numpy as np
 
 
 def accuracy_score(y_true, y_pred):
-    # Accuracy = (TP + TN) / tổng — tỷ lệ dự đoán đúng
-    TP, TN, FP, FN = confusion_matrix_counts(y_true, y_pred)
-    total = TP + TN + FP + FN
-    if total == 0:
-        return 0.0
-    return (TP + TN) / total
+    # Accuracy = số dự đoán đúng / tổng — dùng được cho cả 2 lớp lẫn nhiều lớp
+    return float(np.mean(np.asarray(y_true) == np.asarray(y_pred)))
 
 
 def recall_score(y_true, y_pred):
-    # Recall = TP / (TP + FN) — trong số ca bệnh thật, tìm đúng được bao nhiêu
-    # Recall thấp = bỏ sót nhiều ca bệnh → quan trọng nhất trong y tế
-    TP, TN, FP, FN = confusion_matrix_counts(y_true, y_pred)
-    if TP + FN == 0:
-        return 0.0
-    return TP / (TP + FN)
+    # Macro Recall: tính recall riêng cho từng lớp rồi lấy trung bình
+    # Recall của lớp c = TP_c / (TP_c + FN_c)
+    # → phù hợp cả binary lẫn multi-class
+    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+    recalls = []
+    for c in np.unique(y_true):
+        tp = np.sum((y_true == c) & (y_pred == c))
+        fn = np.sum((y_true == c) & (y_pred != c))
+        recalls.append(tp / (tp + fn) if (tp + fn) > 0 else 0.0)
+    return float(np.mean(recalls))
 
 
 def calculate_all_metrics(y_true, y_pred):
