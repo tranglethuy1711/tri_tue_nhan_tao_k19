@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chuẩn đoán Tiểu Đường</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <h1>Hệ thống chuẩn đoán Tiểu Đường</h1>
+    <p>10 mô hình &bull; 5 độ đo &bull; Phân lớp 3 nhãn: 0 / 1 / 2</p>
+</header>
+
+<main>
+
+    <!-- ===== LOADING ===== -->
+    <div id="section-loading">
+        <div class="spinner"></div>
+        <p id="loading-text">Đang huấn luyện mô hình...</p>
+        <p class="loading-note">Vui lòng chờ...</p>
+    </div>
+
+    <!-- ===== KET QUA (an khi dang load) ===== -->
+    <div id="section-results" class="hidden">
+
+        <!-- Thong tin du lieu -->
+        <div class="card" id="card-data-info">
+            <h2>Thông tin dữ liệu</h2>
+            <div id="data-info-content"></div>
+        </div>
+
+        <!-- Bang ket qua benchmark -->
+        <div class="card">
+            <h2>Kết quả Benchmark — 10 mô hình x 5 độ đo</h2>
+            <p class="note">O xanh = cao nhất &nbsp;|&nbsp; O đỏ = thấp nhất &nbsp;(trong từng cột độ đo)</p>
+            <div class="table-wrapper">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Mô hình</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>Specificity</th>
+                            <th>F1-Score</th>
+                            <th>Time (s)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- Cards mo hinh tot nhat -->
+            <h3 style="margin-top:1.5rem;">Mô hình dẫn đầu theo từng độ đo</h3>
+            <div id="best-cards" class="best-cards"></div>
+        </div>
+
+        <!-- Dự đoán bệnh nhân -->
+        <div class="card">
+            <h2>Dự đoán bệnh nhân mới</h2>
+
+            <div class="predict-config">
+                <label for="model-select">Chọn mô hình:</label>
+                <select id="model-select"></select>
+            </div>
+
+            <p class="note" style="margin-top:1rem;">Nhập thông tin bệnh nhân:</p>
+            <div id="feature-grid" class="feature-grid"></div>
+
+            <button id="predict-btn" onclick="runPredict()">Dự đoán</button>
+
+            <div id="result-box" class="hidden"></div>
+        </div>
+
+    </div>
+</main>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

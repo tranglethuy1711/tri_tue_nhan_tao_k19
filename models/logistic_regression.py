@@ -16,6 +16,9 @@ def softmax(z):
 class LogisticRegressionModel:
 
     def __init__(self, learning_rate=0.1, epochs=300):
+        self.classes = None
+        self.W = None
+        self.b = None
         self.learning_rate = learning_rate
         self.epochs = epochs
 

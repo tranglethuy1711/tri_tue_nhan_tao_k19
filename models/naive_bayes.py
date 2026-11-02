@@ -4,6 +4,12 @@ import numpy as np
 
 class GaussianNaiveBayesModel:
 
+    def __init__(self):
+        self.classes = None
+        self.log_prior = None
+        self.mean = None
+        self.var = None
+
     def fit(self, X, y):
         # Tính prior, mean, variance cho từng lớp
         self.classes = np.unique(y)

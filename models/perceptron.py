@@ -8,6 +8,9 @@ import numpy as np
 class PerceptronModel:
 
     def __init__(self, learning_rate=0.01, epochs=100, random_state=42):
+        self.classes = None
+        self.W = None
+        self.b = None
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.random_state = random_state
