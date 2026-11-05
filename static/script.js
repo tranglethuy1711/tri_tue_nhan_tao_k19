@@ -12,11 +12,28 @@ window.onload = function () {
 
 
 // =====================================================================
+// Tab switching
+// =====================================================================
+function switchTab(tabId, btn) {
+    // An tat ca tab content
+    document.querySelectorAll(".tab-content").forEach(function(el) {
+        el.classList.add("hidden");
+    });
+    // Bo active tren tat ca tab button
+    document.querySelectorAll(".tab-btn").forEach(function(el) {
+        el.classList.remove("active");
+    });
+    // Hien tab duoc chon
+    document.getElementById(tabId).classList.remove("hidden");
+    btn.classList.add("active");
+}
+
+
+// =====================================================================
 // 1. Goi API /run_benchmark va hien thi ket qua
 // =====================================================================
 function runBenchmark() {
     document.getElementById("section-loading").classList.remove("hidden");
-    document.getElementById("section-results").classList.add("hidden");
 
     fetch("/run_benchmark", {
         method:  "POST",
@@ -32,7 +49,7 @@ function runBenchmark() {
         buildPredictForm(data.feature_names, data.results);
 
         document.getElementById("section-loading").classList.add("hidden");
-        document.getElementById("section-results").classList.remove("hidden");
+        document.getElementById("section-main").classList.remove("hidden");
     })
     .catch(function(err) {
         document.getElementById("loading-text").textContent = "Loi: " + err.message;
@@ -159,7 +176,7 @@ function runPredict() {
     var btn       = document.getElementById("predict-btn");
 
     btn.disabled    = true;
-    btn.textContent = "Đang dự đoán...";
+    btn.innerHTML   = "<span>⏳</span> Đang dự đoán...";
 
     fetch("/predict", {
         method:  "POST",
@@ -174,8 +191,8 @@ function runPredict() {
         alert("Loi: " + err.message);
     })
     .finally(function() {
-        btn.disabled    = false;
-        btn.textContent = "Dự đoán";
+        btn.disabled  = false;
+        btn.innerHTML = "<span>🔎</span> Dự đoán";
     });
 }
 

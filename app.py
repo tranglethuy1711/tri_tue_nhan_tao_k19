@@ -1,10 +1,6 @@
-"""
-app.py — Giao diện web Streamlit cho hệ thống chẩn đoán tiểu đường
-Chạy: streamlit run app.py
-"""
 import os, sys, time
 import numpy as np
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, make_response
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -46,7 +42,9 @@ def make_models():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    res = make_response(render_template("index.html"))
+    res.headers["Content-Type"] = "text/html; charset=utf-8"
+    return res
 
 
 @app.route("/run_benchmark", methods=["POST"])
