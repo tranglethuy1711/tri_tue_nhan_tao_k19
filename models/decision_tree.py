@@ -31,9 +31,11 @@ class Node:
 
 class DecisionTreeModel:
 
-    def __init__(self, max_depth=5, min_samples_split=5):
+    def __init__(self, max_depth=5, min_samples_split=5, max_features=None, random_state=None):
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.max_features = max_features    # None = xét tất cả feature ở mỗi nút
+        self.random_state = random_state
         self.root = None
 
     def find_best_split(self, X, y):
@@ -44,7 +46,14 @@ class DecisionTreeModel:
         best_feature = None
         best_threshold = None
 
-        for feature_idx in range(X.shape[1]):
+        n_features = X.shape[1]
+        if self.max_features is None:
+            candidates = range(n_features)
+        else:
+            # Mỗi nút chỉ xét một tập feature ngẫu nhiên (Random Forest)
+            candidates = self.rng.choice(n_features, self.max_features, replace=False)
+
+        for feature_idx in candidates:
             values = np.unique(X[:, feature_idx])
             if len(values) < 2:
                 continue
@@ -81,16 +90,14 @@ class DecisionTreeModel:
         too_few  = X.shape[0] < self.min_samples_split
 
         if all_same_class or too_deep or too_few:
-            count = np.bincount(y, minlength=2)
-            node.label = 0 if count[0] >= count[1] else 1
+            node.label = int(np.bincount(y).argmax())
             return node
 
         # Tìm điểm chia tốt nhất
         result = self.find_best_split(X, y)
         if result is None:
             # Không có chia nào tốt hơn → nút lá
-            count = np.bincount(y, minlength=2)
-            node.label = 0 if count[0] >= count[1] else 1
+            node.label = int(np.bincount(y).argmax())
             return node
 
         feature_idx, threshold = result
@@ -104,6 +111,7 @@ class DecisionTreeModel:
 
     def fit(self, X, y):
         # Xây cây từ dữ liệu train
+        self.rng = np.random.default_rng(self.random_state)
         self.root = self.build_tree(X, y.astype(int), depth=0)
 
     def predict_one(self, x, node):

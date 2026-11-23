@@ -36,6 +36,8 @@ class RandomForestModel:
             tree = DecisionTreeModel(
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
+                max_features=max_feat,
+                random_state=seed,
             )
             tree.fit(X_b, y_b)
             self.trees.append(tree)

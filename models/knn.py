@@ -32,8 +32,8 @@ class KNNModel:
         # Tính toàn bộ ma trận khoảng cách một lần
         dist_matrix = euclidean_distance_matrix(X, self.X_train)  # (n_test, n_train)
 
-        # Lớp đa số trong train (dùng để phá hòa)
-        majority = int(np.bincount(self.y_train).argmax())
+        # Số mẫu mỗi lớp trong train (dùng để phá hòa)
+        train_counts = np.bincount(self.y_train)
 
         predictions = []
         for i in range(X.shape[0]):
@@ -42,10 +42,9 @@ class KNNModel:
             neighbor_labels = self.y_train[nearest_idx]
 
             # Đếm phiếu
-            count = np.bincount(neighbor_labels, minlength=2)
-            if count[0] == count[1]:
-                predictions.append(majority)  # hòa → chọn lớp đa số trong train
-            else:
-                predictions.append(int(count.argmax()))
+            count = np.bincount(neighbor_labels, minlength=len(train_counts))
+            tied = np.flatnonzero(count == count.max())
+            # hòa → chọn lớp có nhiều mẫu nhất trong train trong số các lớp hòa
+            predictions.append(int(tied[np.argmax(train_counts[tied])]))
 
         return np.array(predictions, dtype=int)
